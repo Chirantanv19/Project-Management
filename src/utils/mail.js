@@ -1,4 +1,46 @@
 import Mailgen from "mailgen";
+import nodemailer from "nodemailer"
+
+
+const sendEmail = async(options) => {
+   const mailGenerator =  new Mailgen({
+        theme: 'default',
+        product: {
+            name:"Task Manger",
+            link:"https://taskmaageling.com"
+        }
+    })
+
+    const emailTextual = mailGenerator.generatePlainText(options.mailgenContent)
+    const emailHtml = mailGenerator.generate(options.mailgenContent)
+
+    nodemailer.createTransport({
+        host: process.env.MAILTRAP_SMTP_HOST,
+        port: process.env.MAILTRAP_SMTP_PORT,
+        auth: {
+            user:process.env.MAILTRAP_SMTP_USERNAME,
+            pass: process.env.MAILTRAP_SMTP_PASSWORD
+        }
+    })
+
+    const mail = {
+        from: "chirantannt19@gmail.com",
+        to: option.email,
+        subject: options.subject,
+        text: emailHtml,
+        html: emailHtml
+    }
+    
+    try {
+        await transporter.sendMail(mail)
+    } catch (error) {
+        console.error("Email service failed siliently, might happen because of credential" )
+        console.error(error)
+    }
+
+
+}
+
 
 
 const emailVerificationMailgenContent = (username, verficationUrl) => {
@@ -39,4 +81,4 @@ const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
 };
 
 
-export {emailVerificationMailgenContent, forgotPasswordMailgenContent };
+export {emailVerificationMailgenContent, forgotPasswordMailgenContent, sendEmail };
